@@ -6,6 +6,7 @@ Consumes from Redpanda, processes trades, writes to PostgreSQL
 
 import json
 import logging
+import os
 import psycopg2
 from psycopg2.extras import execute_values
 from kafka import KafkaConsumer
@@ -14,15 +15,15 @@ from kafka.errors import KafkaError
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-BROKER = "redpanda:9092"
+BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
 TOPIC = "stock-trades"
 GROUP_ID = "trading-consumer"
 
 DB_CONFIG = {
-    "host": "postgres",
+    "host": os.getenv("DB_HOST", "postgres"),
     "database": "trading_db",
-    "user": "trading_user",
-    "password": "trading_password",
+    "user": os.getenv("DB_USER", "trading_user"),
+    "password": os.getenv("DB_PASSWORD", "trading_password"),
     "port": 5432
 }
 
@@ -134,7 +135,7 @@ def start_consumer():
                 logger.warning(f"⚠️  Failed to process: {trade['ticker']} {trade['type']}")
     
     except KeyboardInterrupt:
-        logger.info("\n⏹  Consumer stopped")
+        logger.info("\n⏹️  Consumer stopped")
     except KafkaError as e:
         logger.error(f"❌ Kafka Error: {e}")
     finally:

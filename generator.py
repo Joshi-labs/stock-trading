@@ -7,6 +7,7 @@ Produces realistic stock trade messages to Redpanda
 import json
 import time
 import random
+import os
 from datetime import datetime
 from kafka import KafkaProducer
 import logging
@@ -14,7 +15,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-BROKER = "redpanda:9092"
+BROKER = os.getenv("KAFKA_BROKER", "redpanda:9092")
 TOPIC = "stock-trades"
 
 TICKERS = ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "META", "NVDA", "AMD"]
@@ -70,10 +71,10 @@ def start_producer():
                        f"Qty: {trade['quantity']:3} | Price: ${trade['price']:8.2f} | "
                        f"User: {trade['user_id']} | Partition: {record_metadata.partition}")
             
-            time.sleep(random.uniform(0.5, 2))  # Random delay 0.5-2 seconds
+            time.sleep(random.uniform(0.5, 2))
             
     except KeyboardInterrupt:
-        logger.info("\n⏹  Generator stopped")
+        logger.info("\n⏹️  Generator stopped")
     except Exception as e:
         logger.error(f"❌ Error: {e}")
     finally:

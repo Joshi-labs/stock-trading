@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
 
   generator:
-    image: ghcr.io/Joshi-labs/stock-trading/generator:latest
+    image: ghcr.io/joshi-labs/stock-trading/generator:latest
     container_name: trade_generator
     depends_on:
       redpanda:
@@ -57,7 +57,7 @@ services:
     restart: unless-stopped
 
   consumer:
-    image: ghcr.io/Joshi-labs/stock-trading/consumer:latest
+    image: ghcr.io/joshi-labs/stock-trading/consumer:latest
     container_name: trade_consumer
     depends_on:
       postgres:
