@@ -1,0 +1,84 @@
+services:
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:latest
+    container_name: redpanda
+    hostname: redpanda
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    command:
+      - redpanda
+      - start
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    networks:
+      - trading_network
+    healthcheck:
+      test: rpk cluster health
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: trading_user
+      POSTGRES_PASSWORD: trading_password
+      POSTGRES_DB: trading_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - trading_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trading_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  generator:
+    image: ghcr.io/Joshi-labs/stock-trading/generator:latest
+    container_name: trade_generator
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER: redpanda:9092
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+  consumer:
+    image: ghcr.io/Joshi-labs/stock-trading/consumer:latest
+    container_name: trade_consumer
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER: redpanda:9092
+      DB_HOST: postgres
+      DB_USER: trading_user
+      DB_PASSWORD: trading_password
+    networks:
+      - trading_network
+    restart: unless-stopped
+
+volumes:
+  redpanda_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  trading_network:
+    driver: bridge

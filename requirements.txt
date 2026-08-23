@@ -1,0 +1,19 @@
+# Kafka/Redpanda
+kafka-python==2.0.2
+
+# Database
+psycopg2-binary==2.9.9
+
+# Data & Time
+python-dateutil==2.8.2
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Optional: for data processing later
+pandas==2.1.3
+numpy==1.24.3
+
+# Optional: for AWS Lambda (if needed later)
+boto3==1.28.85
