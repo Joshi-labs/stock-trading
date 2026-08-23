@@ -1,3 +1,4 @@
+# consumer.py
 #!/usr/bin/env python3
 """
 Stock Trade Consumer
@@ -135,7 +136,7 @@ def start_consumer():
                 logger.warning(f"⚠️  Failed to process: {trade['ticker']} {trade['type']}")
     
     except KeyboardInterrupt:
-        logger.info("\n⏹️  Consumer stopped")
+        logger.info("\n⏹  Consumer stopped")
     except KafkaError as e:
         logger.error(f"❌ Kafka Error: {e}")
     finally:

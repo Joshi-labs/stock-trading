@@ -1,3 +1,4 @@
+# generator.py
 #!/usr/bin/env python3
 """
 Stock Trade Generator
@@ -74,7 +75,7 @@ def start_producer():
             time.sleep(random.uniform(0.5, 2))
             
     except KeyboardInterrupt:
-        logger.info("\n⏹️  Generator stopped")
+        logger.info("\n⏹  Generator stopped")
     except Exception as e:
         logger.error(f"❌ Error: {e}")
     finally:
