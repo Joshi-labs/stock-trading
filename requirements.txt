@@ -15,5 +15,5 @@ requests==2.31.0
 pandas==2.1.3
 numpy==1.24.3
 
-# Optional: for AWS Lambda (if needed later)
+# Optional: for AWS Lambda (if needed later) 
 boto3==1.28.85
