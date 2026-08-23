@@ -1,5 +1,4 @@
--- Create trading database schema
-
+-- init.sql
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
@@ -10,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS wallets (
     wallet_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    balance DECIMAL(15, 2) DEFAULT 10000.00,
+    balance DECIMAL(15, 2) DEFAULT 50000.00,
     currency VARCHAR(10) DEFAULT 'USD',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,11 +24,12 @@ CREATE TABLE IF NOT EXISTS transactions (
     price DECIMAL(10, 2) NOT NULL,
     total_amount DECIMAL(15, 2) NOT NULL,
     transaction_timestamp TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id),
-    INDEX idx_ticker (ticker),
-    INDEX idx_transaction_timestamp (transaction_timestamp)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_user_id ON transactions(user_id);
+CREATE INDEX idx_ticker ON transactions(ticker);
+CREATE INDEX idx_transaction_timestamp ON transactions(transaction_timestamp);
 
 CREATE TABLE IF NOT EXISTS holdings (
     holding_id SERIAL PRIMARY KEY,
@@ -39,11 +39,11 @@ CREATE TABLE IF NOT EXISTS holdings (
     quantity INTEGER NOT NULL DEFAULT 0,
     avg_purchase_price DECIMAL(10, 2) NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, ticker),
-    INDEX idx_user_ticker (user_id, ticker)
+    UNIQUE(user_id, ticker)
 );
 
--- Sample data
+CREATE INDEX idx_user_ticker ON holdings(user_id, ticker);
+
 INSERT INTO users (username, email) VALUES 
     ('trader_alice', 'alice@example.com'),
     ('trader_bob', 'bob@example.com'),

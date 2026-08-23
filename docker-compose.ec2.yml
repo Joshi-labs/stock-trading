@@ -1,3 +1,4 @@
+# docker-compose.ec2.yml
 services:
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:latest
@@ -34,7 +35,7 @@ services:
       POSTGRES_DB: trading_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - trading_network
     healthcheck:

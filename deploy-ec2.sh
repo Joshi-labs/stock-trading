@@ -1,3 +1,4 @@
+# deploy-ec2.sh
 #!/bin/bash
 
 set -e
@@ -7,16 +8,13 @@ echo "Stock Trading - EC2 Deployment"
 echo "================================"
 echo ""
 
-# Check if docker compose is installed
 if ! command -v docker compose &> /dev/null; then
     echo "❌ docker compose not found. Install Docker first."
     exit 1
 fi
 
-# GitHub username
 if [ -z "$1" ]; then
     echo "Usage: ./deploy-ec2.sh YOUR_GITHUB_USERNAME"
-    echo ""
     echo "Example: ./deploy-ec2.sh joshi-labs"
     exit 1
 fi
@@ -89,17 +87,17 @@ else
     echo "✅ init.sql already exists"
 fi
 
-echo "🛑 Stopping old services (if running)..."
+echo "🛑 Stopping old services..."
 docker compose -f docker-compose.ec2.yml down 2>/dev/null || true
 
-echo "📥 Pulling latest images from GHCR..."
+echo "📥 Pulling latest images..."
 docker compose -f docker-compose.ec2.yml pull
 
 echo "🚀 Starting services..."
 docker compose -f docker-compose.ec2.yml up -d
 
 echo ""
-echo "⏳ Waiting for services to be healthy (20s)..."
+echo "⏳ Waiting 20s for services to be healthy..."
 sleep 20
 
 echo ""
@@ -112,16 +110,10 @@ echo "📊 Service Status:"
 docker compose -f docker-compose.ec2.yml ps
 
 echo ""
-echo "📋 Quick Checks:"
-docker compose -f docker-compose.ec2.yml exec postgres psql -U trading_user -d trading_db -c "SELECT COUNT(*) as users FROM users;" 2>/dev/null || echo "⚠️  DB not ready yet, check logs in 10s"
-
-echo ""
 echo "📋 Useful Commands:"
-echo "  Follow all logs:      docker compose -f docker-compose.ec2.yml logs -f"
-echo "  Follow generator:     docker compose -f docker-compose.ec2.yml logs -f trade_generator"
-echo "  Follow consumer:      docker compose -f docker-compose.ec2.yml logs -f trade_consumer"
-echo "  Check status:         docker compose -f docker-compose.ec2.yml ps"
-echo "  Stop services:        docker compose -f docker-compose.ec2.yml down"
-echo "  Query database:       docker compose -f docker-compose.ec2.yml exec postgres psql -U trading_user -d trading_db"
+echo "  Follow logs:      docker compose -f docker-compose.ec2.yml logs -f"
+echo "  Check status:     docker compose -f docker-compose.ec2.yml ps"
+echo "  Stop services:    docker compose -f docker-compose.ec2.yml down"
+echo "  Query DB:         docker compose -f docker-compose.ec2.yml exec postgres psql -U trading_user -d trading_db"
 echo ""
-echo "✅ Run this to monitor: docker compose -f docker-compose.ec2.yml logs -f"
+echo "✅ Monitor: docker compose -f docker-compose.ec2.yml logs -f"
